@@ -40,3 +40,13 @@ variable "db_password" {
     error_message = "db_password debe tener entre 12 y 41 caracteres y usar solo letras, números, guion o guion bajo."
   }
 }
+
+variable "alert_email" {
+  description = "Correo que recibe las alertas de CloudWatch (se entrega con TF_VAR_alert_email)"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", var.alert_email))
+    error_message = "alert_email debe ser un correo válido."
+  }
+}

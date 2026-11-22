@@ -9,6 +9,12 @@ echo "${dockerfile}" | base64 -d > /opt/tienda/Dockerfile
 echo "${requirements}" | base64 -d > /opt/tienda/requirements.txt
 cd /opt/tienda
 docker build -t tienda .
-docker run -d --name tienda --restart always -p 80:5000 \
-  -e DB_HOST='${db_host}' -e DB_NAME='${db_name}' -e DB_USER='${db_user}' \
-  -e DB_PASSWORD='${db_password}' -e REDIS_HOST='${cache_host}' tienda
+# Reintenta: el permiso IAM de logs puede tardar unos segundos en propagarse
+for i in $(seq 1 12); do
+  docker rm -f tienda 2>/dev/null || true
+  docker run -d --name tienda --restart always -p 80:5000 \
+    --log-driver awslogs --log-opt awslogs-region='${aws_region}' --log-opt awslogs-group='${log_group}' \
+    -e DB_HOST='${db_host}' -e DB_NAME='${db_name}' -e DB_USER='${db_user}' \
+    -e DB_PASSWORD='${db_password}' -e REDIS_HOST='${cache_host}' tienda && break
+  sleep 15
+done

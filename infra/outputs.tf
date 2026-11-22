@@ -32,3 +32,13 @@ output "instance_id" {
   description = "ID de la instancia EC2"
   value       = module.compute.instance_id
 }
+
+output "dashboard_url" {
+  description = "Dashboard de CloudWatch de la tienda"
+  value       = module.observability.dashboard_url
+}
+
+output "log_group" {
+  description = "Grupo de logs del contenedor"
+  value       = module.compute.log_group_name
+}

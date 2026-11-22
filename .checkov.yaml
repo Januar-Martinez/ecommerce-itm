@@ -23,3 +23,7 @@ skip-check:
   - CKV_AWS_126   # monitoreo detallado de EC2 (costo)
   - CKV_AWS_118   # monitoreo mejorado de RDS (costo y rol extra)
   - CKV_AWS_129   # exportar logs de RDS a CloudWatch (dejaría grupos de logs huérfanos al destruir)
+  # --- Observabilidad: cifrado con llaves KMS propias cuesta (USD 1/mes por llave) ---
+  - CKV_AWS_158   # logs cifrados con KMS propia (por defecto CloudWatch ya cifra con llave de AWS)
+  - CKV_AWS_338   # retención de 1 año: en el laboratorio se conservan 7 días
+  - CKV_AWS_26    # SNS con llave AWS gestionada impide que CloudWatch publique las alarmas
