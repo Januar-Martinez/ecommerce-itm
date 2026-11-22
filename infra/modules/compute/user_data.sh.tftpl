@@ -1,0 +1,14 @@
+#!/bin/bash
+# Se ejecuta una sola vez al crear el servidor: instala Docker, construye la imagen y la corre.
+set -x
+dnf install -y docker
+systemctl enable --now docker
+mkdir -p /opt/tienda
+echo "${app_py}" | base64 -d > /opt/tienda/app.py
+echo "${dockerfile}" | base64 -d > /opt/tienda/Dockerfile
+echo "${requirements}" | base64 -d > /opt/tienda/requirements.txt
+cd /opt/tienda
+docker build -t tienda .
+docker run -d --name tienda --restart always -p 80:5000 \
+  -e DB_HOST='${db_host}' -e DB_NAME='${db_name}' -e DB_USER='${db_user}' \
+  -e DB_PASSWORD='${db_password}' -e REDIS_HOST='${cache_host}' tienda
