@@ -37,6 +37,27 @@ resource "aws_iam_instance_profile" "ec2" {
   role = aws_iam_role.ec2.name
 }
 
+# Grupo de logs donde el contenedor Docker envía su salida (driver awslogs)
+resource "aws_cloudwatch_log_group" "app" {
+  name              = "/${var.name_prefix}/app"
+  retention_in_days = 7 # se conservan 7 días para no acumular costo
+}
+
+# Permiso mínimo: solo escribir en ESE grupo de logs
+resource "aws_iam_role_policy" "logs" {
+  name = "${var.name_prefix}-ec2-logs"
+  role = aws_iam_role.ec2.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      Resource = "${aws_cloudwatch_log_group.app.arn}:*"
+    }]
+  })
+}
+
 resource "aws_instance" "web" {
   ami                         = data.aws_ami.al2023.id
   instance_type               = var.instance_type
@@ -45,6 +66,8 @@ resource "aws_instance" "web" {
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
   associate_public_ip_address = true
   ebs_optimized               = true
+
+  depends_on = [aws_iam_role_policy.logs]
 
   root_block_device {
     encrypted   = true # disco cifrado en reposo
@@ -62,6 +85,8 @@ resource "aws_instance" "web" {
     db_user      = var.db_username
     db_password  = var.db_password
     cache_host   = var.cache_host
+    aws_region   = var.aws_region
+    log_group    = aws_cloudwatch_log_group.app.name
   }))
 
   metadata_options {

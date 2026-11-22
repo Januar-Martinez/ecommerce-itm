@@ -39,3 +39,8 @@ variable "db_password" {
 variable "cache_host" {
   type = string
 }
+
+variable "aws_region" {
+  description = "Región de AWS (para el driver de logs de Docker)"
+  type        = string
+}

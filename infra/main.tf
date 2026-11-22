@@ -51,4 +51,17 @@ module "compute" {
   db_username = var.db_username
   db_password = var.db_password
   cache_host  = module.database.cache_endpoint
+  aws_region  = var.aws_region
+}
+
+module "observability" {
+  source = "./modules/observability"
+
+  name_prefix      = var.name_prefix
+  aws_region       = var.aws_region
+  alert_email      = var.alert_email
+  instance_id      = module.compute.instance_id
+  db_identifier    = module.database.db_identifier
+  cache_cluster_id = module.database.cache_cluster_id
+  log_group_name   = module.compute.log_group_name
 }

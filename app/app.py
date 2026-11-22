@@ -169,6 +169,14 @@ def orders():
     return render_template_string(PAGE, body=body)
 
 
+@app.route("/error")
+def error():
+    """Ruta de demostración: genera un error a propósito para probar la observabilidad."""
+    app.logger.error("ERROR simulado: fallo intencional para la demostracion de observabilidad")
+    body = "<div class=empty>Se registró un error simulado. Revisa CloudWatch.</div>"
+    return render_template_string(PAGE, body=body), 500
+
+
 @app.route("/health")
 def health():
     R.ping()
