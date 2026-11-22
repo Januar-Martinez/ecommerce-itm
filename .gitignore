@@ -1,0 +1,10 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+.terraform.lock.hcl.bak
+__pycache__/
+*.zip
+.terraform.lock.hcl

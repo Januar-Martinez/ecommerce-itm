@@ -1,0 +1,25 @@
+# Excepciones DOCUMENTADAS al escaneo de seguridad (Checkov).
+# Este es un laboratorio con créditos limitados y se destruye al terminar.
+# En producción cada una de estas excepciones se revisaría y se corregiría.
+framework:
+  - terraform
+quiet: true
+compact: true
+skip-check:
+  # --- Red: necesarios para que la tienda sea pública sin pagar NAT Gateway ---
+  - CKV_AWS_88    # el EC2 necesita IP pública (no hay NAT Gateway, que cuesta ~USD 32/mes)
+  - CKV_AWS_130   # subredes públicas asignan IP pública por el mismo motivo
+  - CKV_AWS_260   # el puerto 80 abierto es el propósito de la tienda (sin HTTPS: mejora futura)
+  - CKV_AWS_382   # salida abierta: el servidor debe descargar Docker e imágenes
+  - CKV2_AWS_11   # VPC Flow Logs generan costo de logs
+  - CKV_AWS_394   # fijar zonas de disponibilidad: no aplica al laboratorio
+  - CKV2_AWS_5    # falso positivo: los SG se adjuntan desde otros módulos
+  # --- Alta disponibilidad / respaldo: duplican costo, no aplican a un laboratorio ---
+  - CKV_AWS_157   # RDS Multi-AZ
+  - CKV_AWS_133   # backups automáticos de RDS (se destruye al finalizar)
+  - CKV_AWS_293   # protección contra borrado: impediría el destroy final
+  - CKV_AWS_134   # snapshots automáticos de Redis
+  # --- Monitoreo avanzado de pago: se cubre con CloudWatch básico (módulo de observabilidad) ---
+  - CKV_AWS_126   # monitoreo detallado de EC2 (costo)
+  - CKV_AWS_118   # monitoreo mejorado de RDS (costo y rol extra)
+  - CKV_AWS_129   # exportar logs de RDS a CloudWatch (dejaría grupos de logs huérfanos al destruir)
